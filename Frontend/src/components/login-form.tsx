@@ -27,11 +27,13 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setErrorMessage("")
+    setSuccessMessage("")
     setIsSubmitting(true)
 
     try {
@@ -46,7 +48,10 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
       localStorage.setItem("token", response.token)
       localStorage.setItem("admin", JSON.stringify(response.admin))
 
-      navigate("/dashboard")
+      setSuccessMessage("Login successful. Redirecting to dashboard...")
+      setTimeout(() => {
+        navigate("/dashboard")
+      }, 400)
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message)
@@ -98,6 +103,12 @@ export function LoginForm({ className, ...props }: LoginFormProps) {
               {errorMessage && (
                 <FieldDescription className="text-red-600">
                   {errorMessage}
+                </FieldDescription>
+              )}
+
+              {successMessage && (
+                <FieldDescription className="text-green-600">
+                  {successMessage}
                 </FieldDescription>
               )}
 

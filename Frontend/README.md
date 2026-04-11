@@ -1,73 +1,172 @@
-# React + TypeScript + Vite
+# School Management Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend for the School Management Mini System. It is built with React, TypeScript, Vite, React Router, and reusable UI components.
 
-Currently, two official plugins are available:
+The app connects to the backend API and provides:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Admin registration
+- Admin login
+- Protected dashboard access
+- Student management
+- Task management
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19
+- TypeScript
+- Vite
+- React Router DOM
+- Tailwind CSS
+- shadcn-style UI components
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Register a new admin account
+- Login with admin credentials
+- Protect dashboard routes using token-based access
+- Add a student
+- View all students
+- Edit a student
+- Delete a student
+- Assign a task to a student
+- View all tasks
+- Mark a task as done
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Routes
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- `/` - Login page
+- `/register` - Register page
+- `/dashboard` - Protected dashboard
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project Structure
+
+```text
+src/
+  components/
+    login-form.tsx
+    register-form.tsx
+    ProtectedRoute.tsx
+    StudentForm.tsx
+    StudentList.tsx
+    TaskForm.tsx
+    TaskList.tsx
+    ui/
+  lib/
+    utils.ts
+  pages/
+    Login.tsx
+    Register.tsx
+    Dashboard.tsx
+  services/
+    Api.ts
+  types/
+    index.ts
+  App.tsx
+  main.tsx
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Prerequisites
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Make sure you have:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- Node.js installed
+- npm installed
+- The backend server running locally
+
+Vite currently recommends Node.js `20.19+` or `22.12+`.
+
+## Installation
+
+From the `Frontend` folder:
+
+```bash
+npm install
 ```
+
+## Run the Frontend
+
+Development:
+
+```bash
+npm run dev
+```
+
+Build:
+
+```bash
+npm run build
+```
+
+Preview production build:
+
+```bash
+npm run preview
+```
+
+## Backend Requirement
+
+This frontend expects the backend to run at:
+
+```text
+http://localhost:8000
+```
+
+The API helper is currently configured in:
+
+- `src/services/Api.ts`
+
+If your backend runs on a different port or host, update the `BASE_URL` there.
+
+## API Usage
+
+The frontend is integrated with these backend routes:
+
+### Auth
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+
+### Students
+
+- `GET /api/students`
+- `POST /api/students`
+- `PUT /api/students/:id`
+- `DELETE /api/students/:id`
+
+### Tasks
+
+- `GET /api/task`
+- `POST /api/task`
+- `PUT /api/task/:id`
+
+## Authentication Flow
+
+- On successful login, the JWT token is stored in `localStorage`
+- Admin details are also stored in `localStorage`
+- The dashboard route is protected through `ProtectedRoute`
+- On logout, stored auth data is removed
+
+## Notes
+
+- Task creation requires a valid student to be selected
+- Task status values are `pending` and `done`
+- Deleting a student in the frontend also removes related tasks from the local dashboard state
+- Success and error messages are shown in the UI for important actions
+
+## How To Test
+
+Recommended flow:
+
+1. Register a new admin
+2. Login with that admin account
+3. Add one or more students
+4. Edit a student
+5. Delete a student
+6. Assign a task to a student
+7. Mark a task as done
+8. Logout
+9. Try opening `/dashboard` without logging in
+
+## Submission Note
+
+This frontend is designed specifically for the provided backend assignment and mirrors the backend modules for auth, students, and tasks.

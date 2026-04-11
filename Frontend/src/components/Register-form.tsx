@@ -1,6 +1,7 @@
 import { type FormEvent, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { apiRequest } from "@/services/Api"
+import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -17,11 +18,13 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
+type RegisterFormProps = React.ComponentProps<"div">
+
 type RegisterResponse = {
   msg: string
 }
 
-export function RegisterForm() {
+export function RegisterForm({ className, ...props }: RegisterFormProps) {
   const navigate = useNavigate()
 
   const [name, setName] = useState("")
@@ -63,7 +66,7 @@ export function RegisterForm() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle>Create your account</CardTitle>

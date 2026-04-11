@@ -26,6 +26,7 @@ function Dashboard() {
   const [isLoadingStudents, setIsLoadingStudents] = useState(true)
   const [isLoadingTasks, setIsLoadingTasks] = useState(true)
   const [errorMessage, setErrorMessage] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
 
   const [studentName, setStudentName] = useState("")
   const [className, setClassName] = useState("")
@@ -42,6 +43,18 @@ function Dashboard() {
   const token = localStorage.getItem("token")
   const adminData = localStorage.getItem("admin")
   const admin: Admin | null = adminData ? JSON.parse(adminData) : null
+
+  useEffect(() => {
+    if (!successMessage) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setSuccessMessage("")
+    }, 2500)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [successMessage])
 
   const resetStudentForm = () => {
     setStudentName("")
@@ -87,14 +100,9 @@ function Dashboard() {
   }
 
   useEffect(() => {
-    if (!token) {
-      navigate("/")
-      return
-    }
-
     void fetchStudents()
     void fetchTasks()
-  }, [token, navigate])
+  }, [])
 
   const handleLogout = () => {
     localStorage.removeItem("token")
@@ -105,6 +113,7 @@ function Dashboard() {
   const handleSaveStudent = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setErrorMessage("")
+    setSuccessMessage("")
     setIsSavingStudent(true)
 
     try {
@@ -126,6 +135,7 @@ function Dashboard() {
             student._id === editingStudentId ? response.student : student
           )
         )
+        setSuccessMessage("Student updated successfully.")
       } else {
         const response = await apiRequest<CreateStudentResponse>("/api/students", {
           method: "POST",
@@ -137,6 +147,7 @@ function Dashboard() {
         })
 
         setStudents((currentStudents) => [response.student, ...currentStudents])
+        setSuccessMessage("Student added successfully.")
       }
 
       resetStudentForm()
@@ -160,7 +171,16 @@ function Dashboard() {
   }
 
   const handleDeleteStudent = async (studentId: string) => {
+    const shouldDelete = window.confirm(
+      "Are you sure you want to delete this student?"
+    )
+
+    if (!shouldDelete) {
+      return
+    }
+
     setErrorMessage("")
+    setSuccessMessage("")
 
     try {
       await apiRequest<DeleteStudentResponse>(`/api/students/${studentId}`, {
@@ -181,6 +201,8 @@ function Dashboard() {
       if (selectedStudentId === studentId) {
         setSelectedStudentId("")
       }
+
+      setSuccessMessage("Student deleted successfully.")
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message)
@@ -193,6 +215,7 @@ function Dashboard() {
   const handleCreateTask = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setErrorMessage("")
+    setSuccessMessage("")
     setIsCreatingTask(true)
 
     try {
@@ -211,6 +234,7 @@ function Dashboard() {
       setSelectedStudentId("")
       setIsLoadingTasks(true)
       await fetchTasks()
+      setSuccessMessage("Task assigned successfully.")
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message)
@@ -224,6 +248,7 @@ function Dashboard() {
 
   const handleMarkTaskDone = async (taskId: string) => {
     setErrorMessage("")
+    setSuccessMessage("")
     setMarkingTaskId(taskId)
 
     try {
@@ -234,6 +259,7 @@ function Dashboard() {
       setTasks((currentTasks) =>
         currentTasks.map((task) => (task._id === taskId ? response.task : task))
       )
+      setSuccessMessage("Task marked as done.")
     } catch (error) {
       if (error instanceof Error) {
         setErrorMessage(error.message)
@@ -257,6 +283,12 @@ function Dashboard() {
       {errorMessage && (
         <div className="mt-4 rounded-md border border-red-300 bg-red-50 p-3 text-red-700">
           {errorMessage}
+        </div>
+      )}
+
+      {successMessage && (
+        <div className="mt-4 rounded-md border border-green-300 bg-green-50 p-3 text-green-700">
+          {successMessage}
         </div>
       )}
 
