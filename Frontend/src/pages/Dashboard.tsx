@@ -1,5 +1,9 @@
 import { type FormEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import StudentForm from "@/components/StudentForm"
+import StudentList from "@/components/StudentList"
+import TaskForm from "@/components/TaskForm"
+import TaskList from "@/components/TaskList"
 import { apiRequest } from "@/services/Api"
 import type {
   Admin,
@@ -262,212 +266,44 @@ function Dashboard() {
         <p>Email: {admin?.email}</p>
       </div>
 
-      <div className="mt-6 rounded-lg border p-4">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="text-xl font-semibold">
-            {editingStudentId ? "Edit Student" : "Add Student"}
-          </h2>
+      <StudentForm
+        studentName={studentName}
+        className={className}
+        age={age}
+        editingStudentId={editingStudentId}
+        isSavingStudent={isSavingStudent}
+        onStudentNameChange={setStudentName}
+        onClassNameChange={setClassName}
+        onAgeChange={setAge}
+        onSubmit={handleSaveStudent}
+        onCancelEdit={resetStudentForm}
+      />
 
-          {editingStudentId && (
-            <button
-              type="button"
-              onClick={resetStudentForm}
-              className="rounded-md border px-4 py-2"
-            >
-              Cancel Edit
-            </button>
-          )}
-        </div>
+      <StudentList
+        students={students}
+        isLoadingStudents={isLoadingStudents}
+        onEditStudent={handleEditStudent}
+        onDeleteStudent={handleDeleteStudent}
+      />
 
-        <form onSubmit={handleSaveStudent} className="mt-4 space-y-4">
-          <div>
-            <label className="block">Student Name</label>
-            <input
-              type="text"
-              value={studentName}
-              onChange={(event) => setStudentName(event.target.value)}
-              className="mt-1 w-full rounded-md border p-2"
-              required
-            />
-          </div>
+      <TaskForm
+        taskTitle={taskTitle}
+        taskDescription={taskDescription}
+        selectedStudentId={selectedStudentId}
+        students={students}
+        isCreatingTask={isCreatingTask}
+        onTaskTitleChange={setTaskTitle}
+        onTaskDescriptionChange={setTaskDescription}
+        onSelectedStudentChange={setSelectedStudentId}
+        onSubmit={handleCreateTask}
+      />
 
-          <div>
-            <label className="block">Class</label>
-            <input
-              type="text"
-              value={className}
-              onChange={(event) => setClassName(event.target.value)}
-              className="mt-1 w-full rounded-md border p-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block">Age</label>
-            <input
-              type="number"
-              value={age}
-              onChange={(event) => setAge(event.target.value)}
-              className="mt-1 w-full rounded-md border p-2"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isSavingStudent}
-            className="rounded-md bg-black px-4 py-2 text-white"
-          >
-            {isSavingStudent
-              ? editingStudentId
-                ? "Updating..."
-                : "Adding..."
-              : editingStudentId
-                ? "Update Student"
-                : "Add Student"}
-          </button>
-        </form>
-      </div>
-
-      <div className="mt-6 rounded-lg border p-4">
-        <h2 className="text-xl font-semibold">Students</h2>
-
-        {isLoadingStudents && <p className="mt-2">Loading students...</p>}
-
-        {!isLoadingStudents && students.length === 0 && (
-          <p className="mt-2">No students found.</p>
-        )}
-
-        {!isLoadingStudents && students.length > 0 && (
-          <ul className="mt-4 space-y-3">
-            {students.map((student) => (
-              <li key={student._id} className="rounded-md border p-3">
-                <p>
-                  <strong>Name:</strong> {student.name}
-                </p>
-                <p>
-                  <strong>Class:</strong> {student.className}
-                </p>
-                <p>
-                  <strong>Age:</strong> {student.age}
-                </p>
-
-                <div className="mt-3 flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => handleEditStudent(student)}
-                    className="rounded-md border px-4 py-2"
-                  >
-                    Edit
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteStudent(student._id)}
-                    className="rounded-md bg-red-600 px-4 py-2 text-white"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="mt-6 rounded-lg border p-4">
-        <h2 className="text-xl font-semibold">Assign Task</h2>
-
-        <form onSubmit={handleCreateTask} className="mt-4 space-y-4">
-          <div>
-            <label className="block">Title</label>
-            <input
-              type="text"
-              value={taskTitle}
-              onChange={(event) => setTaskTitle(event.target.value)}
-              className="mt-1 w-full rounded-md border p-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block">Description</label>
-            <textarea
-              value={taskDescription}
-              onChange={(event) => setTaskDescription(event.target.value)}
-              className="mt-1 w-full rounded-md border p-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block">Student</label>
-            <select
-              value={selectedStudentId}
-              onChange={(event) => setSelectedStudentId(event.target.value)}
-              className="mt-1 w-full rounded-md border p-2"
-              required
-            >
-              <option value="">Select a student</option>
-              {students.map((student) => (
-                <option key={student._id} value={student._id}>
-                  {student.name} - Class {student.className}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <button
-            type="submit"
-            disabled={isCreatingTask || students.length === 0}
-            className="rounded-md bg-black px-4 py-2 text-white"
-          >
-            {isCreatingTask ? "Assigning..." : "Assign Task"}
-          </button>
-        </form>
-      </div>
-
-      <div className="mt-6 rounded-lg border p-4">
-        <h2 className="text-xl font-semibold">Tasks</h2>
-
-        {isLoadingTasks && <p className="mt-2">Loading tasks...</p>}
-
-        {!isLoadingTasks && tasks.length === 0 && (
-          <p className="mt-2">No tasks found.</p>
-        )}
-
-        {!isLoadingTasks && tasks.length > 0 && (
-          <ul className="mt-4 space-y-3">
-            {tasks.map((task) => (
-              <li key={task._id} className="rounded-md border p-3">
-                <p>
-                  <strong>Title:</strong> {task.title}
-                </p>
-                <p>
-                  <strong>Description:</strong> {task.description}
-                </p>
-                <p>
-                  <strong>Student:</strong> {task.student?.name ?? "Unknown"}
-                </p>
-                <p>
-                  <strong>Status:</strong> {task.status}
-                </p>
-
-                {task.status === "pending" && (
-                  <button
-                    type="button"
-                    onClick={() => handleMarkTaskDone(task._id)}
-                    disabled={markingTaskId === task._id}
-                    className="mt-3 rounded-md bg-green-600 px-4 py-2 text-white"
-                  >
-                    {markingTaskId === task._id ? "Updating..." : "Mark as Done"}
-                  </button>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <TaskList
+        tasks={tasks}
+        isLoadingTasks={isLoadingTasks}
+        markingTaskId={markingTaskId}
+        onMarkTaskDone={handleMarkTaskDone}
+      />
 
       <button
         onClick={handleLogout}
